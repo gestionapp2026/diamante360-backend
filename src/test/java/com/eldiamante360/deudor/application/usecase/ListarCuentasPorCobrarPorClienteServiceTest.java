@@ -1,0 +1,73 @@
+package com.eldiamante360.deudor.application.usecase;
+
+import com.eldiamante360.cliente.application.port.ClienteRepositoryPort;
+import com.eldiamante360.cliente.domain.model.Cliente;
+import com.eldiamante360.cliente.domain.model.TipoDocumentoCliente;
+import com.eldiamante360.deudor.application.dto.CuentaPorCobrarResult;
+import com.eldiamante360.deudor.application.port.CuentaPorCobrarRepositoryPort;
+import com.eldiamante360.deudor.domain.model.CuentaPorCobrar;
+import com.eldiamante360.deudor.domain.model.EstadoCuentaPorCobrar;
+import com.eldiamante360.shared.domain.exception.RecursoNoEncontradoException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ListarCuentasPorCobrarPorClienteServiceTest {
+
+    @Mock
+    private CuentaPorCobrarRepositoryPort cuentaPorCobrarRepositoryPort;
+
+    @Mock
+    private ClienteRepositoryPort clienteRepositoryPort;
+
+    private ListarCuentasPorCobrarPorClienteService service;
+
+    @BeforeEach
+    void setUp() {
+        service = new ListarCuentasPorCobrarPorClienteService(cuentaPorCobrarRepositoryPort, clienteRepositoryPort);
+    }
+
+    @Test
+    void ejecutar_conClienteExistente_retornaLaPaginaMapeada() {
+        Cliente cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+                "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
+        CuentaPorCobrar cuenta = new CuentaPorCobrar(50L, 100L, "FAC-2026-00001", 1L, "Juan Perez", "123456789",
+                BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), EstadoCuentaPorCobrar.PENDIENTE, 9L, null, null,
+                null, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        when(clienteRepositoryPort.buscarPorId(1L)).thenReturn(Optional.of(cliente));
+        when(cuentaPorCobrarRepositoryPort.listarPorCliente(1L, pageable)).thenReturn(new PageImpl<>(List.of(cuenta)));
+
+        Page<CuentaPorCobrarResult> resultado = service.ejecutar(1L, pageable);
+
+        assertThat(resultado.getContent()).hasSize(1);
+        assertThat(resultado.getContent().get(0).clienteId()).isEqualTo(1L);
+    }
+
+    @Test
+    void ejecutar_conClienteInexistente_lanzaExcepcionYNoInteractuaConCuentasPorCobrar() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(clienteRepositoryPort.buscarPorId(404L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.ejecutar(404L, pageable))
+                .isInstanceOf(RecursoNoEncontradoException.class);
+
+        verifyNoInteractions(cuentaPorCobrarRepositoryPort);
+    }
+}
