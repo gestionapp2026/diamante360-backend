@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void requestValido_noProduceViolaciones() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         Set<ConstraintViolation<CrearClienteRequest>> violaciones = validator.validate(request);
 
@@ -42,7 +43,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void tipoDocumentoNulo_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(null, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -50,7 +51,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void numeroDocumentoVacio_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -58,7 +59,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void numeroDocumentoExcedeLongitud_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "1".repeat(21), "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -66,7 +67,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void nombreVacio_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -74,7 +75,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void nombreExcedeLongitud_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "a".repeat(151),
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -82,7 +83,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void telefonoExcedeLongitud_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "1".repeat(21), "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("1".repeat(21)), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -90,7 +91,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void emailConFormatoInvalido_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "correo-invalido", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "correo-invalido", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -98,7 +99,7 @@ class CrearClienteRequestValidationTest {
     @Test
     void emailExcedeLongitud_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "a".repeat(115) + "@x.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "a".repeat(115) + "@x.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }
@@ -106,7 +107,15 @@ class CrearClienteRequestValidationTest {
     @Test
     void direccionExcedeLongitud_produceViolacion() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "a".repeat(201), null);
+                List.of("3001234567"), "juan@correo.com", "a".repeat(201), null);
+
+        assertThat(validator.validate(request)).isNotEmpty();
+    }
+
+    @Test
+    void masDeCincoTelefonos_produceViolacion() {
+        CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
+                List.of("1", "2", "3", "4", "5", "6"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(validator.validate(request)).isNotEmpty();
     }

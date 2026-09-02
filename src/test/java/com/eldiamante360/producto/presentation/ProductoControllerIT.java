@@ -253,7 +253,6 @@ class ProductoControllerIT extends BaseIntegrationTest {
         ApiErrorAssertions.verificarErrorDeCampo(error, "tipoVenta");
         ApiErrorAssertions.verificarErrorDeCampo(error, "unidadMedida");
         ApiErrorAssertions.verificarErrorDeCampo(error, "precioCompra");
-        ApiErrorAssertions.verificarErrorDeCampo(error, "precioVenta");
         ApiErrorAssertions.verificarErrorDeCampo(error, "stockInicial");
         ApiErrorAssertions.verificarErrorDeCampo(error, "stockMinimo");
     }
@@ -277,6 +276,26 @@ class ProductoControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void crear_sinPrecioVenta_creaConPrecioVentaCero() {
+        // El precio de venta ya no es obligatorio al crear: el vendedor puede registrar el producto
+        // sobre la marcha y el precio se define despues editandolo (ver CrearProductoService).
+        TokenResponse admin = AuthTestHelper.loginComoAdmin();
+        CategoriaResponse categoria = ProductoTestHelper.crearCategoriaActiva(admin.accessToken());
+
+        var request = new CrearProductoRequest(TestDataFactory.nombreCompleto("Producto Sin Precio Venta"),
+                categoria.id(), TipoVenta.UNIDAD, UnidadMedida.UND, BigDecimal.TEN, null,
+                BigDecimal.ONE, BigDecimal.ZERO);
+
+        ProductoResponse creado = AuthTestHelper.autenticado(admin.accessToken())
+                .body(request)
+                .when().post("/productos")
+                .then().statusCode(201)
+                .extract().as(ProductoResponse.class);
+
+        assertThat(creado.precioVenta()).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
     void crear_sinAutenticacion_devuelve401() {
         var request = new CrearProductoRequest(TestDataFactory.nombreCompleto("Producto Sin Auth"), 1L,
                 TipoVenta.UNIDAD, UnidadMedida.UND, BigDecimal.TEN, BigDecimal.TEN,
@@ -288,7 +307,9 @@ class ProductoControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void crear_comoVendedorSinPermisoProductoCrear_devuelve403() {
+    void crear_comoVendedorConPermisoProductoCrear_devuelve201() {
+        // VENDEDOR tiene PRODUCTO_CREAR (V21__permisos_vendedor_crear_cliente_producto.sql): puede
+        // registrar un producto nuevo sobre la marcha al facturar, sin depender de un admin.
         TokenResponse admin = AuthTestHelper.loginComoAdmin();
         CategoriaResponse categoria = ProductoTestHelper.crearCategoriaActiva(admin.accessToken());
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
@@ -300,7 +321,7 @@ class ProductoControllerIT extends BaseIntegrationTest {
         AuthTestHelper.autenticado(vendedor.accessToken())
                 .body(request)
                 .when().post("/productos")
-                .then().statusCode(403);
+                .then().statusCode(201);
     }
 
     // ---------------------------------------------------------------

@@ -36,7 +36,7 @@ class ClienteControllerIT extends BaseIntegrationTest {
         RutaResponse ruta = ClienteTestHelper.crearRutaActiva(admin.accessToken());
 
         var request = new CrearClienteRequest(TipoDocumentoCliente.CC, TestDataFactory.numeroDocumento(),
-                TestDataFactory.nombreCompleto("Cliente Full"), TestDataFactory.telefono(),
+                TestDataFactory.nombreCompleto("Cliente Full"), TestDataFactory.telefonos(),
                 TestDataFactory.email("full"), "Calle 1 # 2-3", ruta.id());
 
         ClienteResponse creado = AuthTestHelper.autenticado(admin.accessToken())
@@ -61,7 +61,7 @@ class ClienteControllerIT extends BaseIntegrationTest {
 
         ClienteResponse creado = ClienteTestHelper.crearClienteMinimo(admin.accessToken());
 
-        assertThat(creado.telefono()).isNull();
+        assertThat(creado.telefonos()).isEmpty();
         assertThat(creado.email()).isNull();
         assertThat(creado.direccion()).isNull();
         assertThat(creado.rutaId()).isNull();
@@ -149,15 +149,17 @@ class ClienteControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void crear_comoVendedorSinPermisoClienteCrear_devuelve403() {
+    void crear_comoVendedorConPermisoClienteCrear_devuelve201() {
+        // VENDEDOR tiene CLIENTE_CREAR (V21__permisos_vendedor_crear_cliente_producto.sql): puede
+        // registrar un cliente nuevo sobre la marcha al facturar, sin depender de un admin.
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
         var request = new CrearClienteRequest(TipoDocumentoCliente.CC, TestDataFactory.numeroDocumento(),
-                TestDataFactory.nombreCompleto("Vendedor Sin Permiso"), null, null, null, null);
+                TestDataFactory.nombreCompleto("Vendedor Con Permiso"), null, null, null, null);
 
         AuthTestHelper.autenticado(vendedor.accessToken())
                 .body(request)
                 .when().post("/clientes")
-                .then().statusCode(403);
+                .then().statusCode(201);
     }
 
     // ---------------------------------------------------------------
@@ -247,7 +249,7 @@ class ClienteControllerIT extends BaseIntegrationTest {
         ClienteResponse creado = ClienteTestHelper.crearClienteMinimo(admin.accessToken());
 
         var request = new ActualizarClienteRequest(TestDataFactory.nombreCompleto("Cliente Actualizado"),
-                TestDataFactory.telefono(), TestDataFactory.email("actualizado"), "Nueva Direccion 456");
+                TestDataFactory.telefonos(), TestDataFactory.email("actualizado"), "Nueva Direccion 456");
 
         ClienteResponse actualizado = AuthTestHelper.autenticado(admin.accessToken())
                 .body(request)
@@ -256,7 +258,7 @@ class ClienteControllerIT extends BaseIntegrationTest {
                 .extract().as(ClienteResponse.class);
 
         assertThat(actualizado.nombre()).isEqualTo(request.nombre());
-        assertThat(actualizado.telefono()).isEqualTo(request.telefono());
+        assertThat(actualizado.telefonos()).isEqualTo(request.telefonos());
         assertThat(actualizado.email()).isEqualTo(request.email());
         assertThat(actualizado.direccion()).isEqualTo(request.direccion());
         assertThat(actualizado.numeroDocumento()).isEqualTo(creado.numeroDocumento());

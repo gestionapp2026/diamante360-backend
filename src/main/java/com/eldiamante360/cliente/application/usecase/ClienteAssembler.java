@@ -27,7 +27,7 @@ final class ClienteAssembler {
                 cliente.getTipoDocumento(),
                 cliente.getNumeroDocumento(),
                 cliente.getNombre(),
-                cliente.getTelefono(),
+                cliente.getTelefonos(),
                 cliente.getEmail(),
                 cliente.getDireccion(),
                 ruta != null ? ruta.getId() : null,

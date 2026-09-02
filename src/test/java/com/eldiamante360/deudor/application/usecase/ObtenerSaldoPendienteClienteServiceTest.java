@@ -1,5 +1,6 @@
 package com.eldiamante360.deudor.application.usecase;
 
+import java.util.List;
 import com.eldiamante360.cliente.application.port.ClienteRepositoryPort;
 import com.eldiamante360.cliente.domain.model.Cliente;
 import com.eldiamante360.cliente.domain.model.TipoDocumentoCliente;
@@ -38,7 +39,7 @@ class ObtenerSaldoPendienteClienteServiceTest {
 
     @Test
     void ejecutar_conClienteExistente_retornaElSaldoSumado() {
-        Cliente cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
         when(clienteRepositoryPort.buscarPorId(1L)).thenReturn(Optional.of(cliente));
         when(cuentaPorCobrarRepositoryPort.sumarSaldoPendientePorCliente(1L)).thenReturn(BigDecimal.valueOf(1500));

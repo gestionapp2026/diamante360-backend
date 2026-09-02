@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,11 +51,11 @@ class CrearClienteServiceTest {
     @Test
     void ejecutar_conDocumentoLibreYSinRuta_creaElClienteYRegistraHistorial() {
         CrearClienteCommand command = new CrearClienteCommand(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null, 1L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null, 1L);
         when(clienteRepositoryPort.existePorNumeroDocumento("123456789")).thenReturn(false);
         when(clienteRepositoryPort.guardar(any(Cliente.class))).thenAnswer(invocacion -> {
             Cliente c = invocacion.getArgument(0);
-            return new Cliente(10L, c.getTipoDocumento(), c.getNumeroDocumento(), c.getNombre(), c.getTelefono(),
+            return new Cliente(10L, c.getTipoDocumento(), c.getNumeroDocumento(), c.getNombre(), c.getTelefonos(),
                     c.getEmail(), c.getDireccion(), c.getRuta(), c.isActivo(), 0);
         });
 
@@ -75,12 +76,12 @@ class CrearClienteServiceTest {
     void ejecutar_conRutaActiva_asignaLaRuta() {
         Ruta ruta = new Ruta(2L, "Ruta Norte", "Zona norte", true);
         CrearClienteCommand command = new CrearClienteCommand(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", 2L, 1L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", 2L, 1L);
         when(clienteRepositoryPort.existePorNumeroDocumento("123456789")).thenReturn(false);
         when(rutaRepositoryPort.buscarPorId(2L)).thenReturn(Optional.of(ruta));
         when(clienteRepositoryPort.guardar(any(Cliente.class))).thenAnswer(invocacion -> {
             Cliente c = invocacion.getArgument(0);
-            return new Cliente(10L, c.getTipoDocumento(), c.getNumeroDocumento(), c.getNombre(), c.getTelefono(),
+            return new Cliente(10L, c.getTipoDocumento(), c.getNumeroDocumento(), c.getNombre(), c.getTelefonos(),
                     c.getEmail(), c.getDireccion(), c.getRuta(), c.isActivo(), 0);
         });
 
@@ -93,7 +94,7 @@ class CrearClienteServiceTest {
     @Test
     void ejecutar_conDocumentoYaExistente_lanzaExcepcion() {
         CrearClienteCommand command = new CrearClienteCommand(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null, 1L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null, 1L);
         when(clienteRepositoryPort.existePorNumeroDocumento("123456789")).thenReturn(true);
 
         assertThatThrownBy(() -> service.ejecutar(command))
@@ -103,7 +104,7 @@ class CrearClienteServiceTest {
     @Test
     void ejecutar_conRutaInexistente_lanzaExcepcion() {
         CrearClienteCommand command = new CrearClienteCommand(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", 404L, 1L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", 404L, 1L);
         when(clienteRepositoryPort.existePorNumeroDocumento("123456789")).thenReturn(false);
         when(rutaRepositoryPort.buscarPorId(404L)).thenReturn(Optional.empty());
 
@@ -115,7 +116,7 @@ class CrearClienteServiceTest {
     void ejecutar_conRutaInactiva_lanzaExcepcion() {
         Ruta rutaInactiva = new Ruta(2L, "Ruta Norte", "Zona norte", false);
         CrearClienteCommand command = new CrearClienteCommand(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", 2L, 1L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", 2L, 1L);
         when(clienteRepositoryPort.existePorNumeroDocumento("123456789")).thenReturn(false);
         when(rutaRepositoryPort.buscarPorId(2L)).thenReturn(Optional.of(rutaInactiva));
 

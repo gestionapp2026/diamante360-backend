@@ -34,7 +34,7 @@ public final class ClienteTestHelper {
                 TipoDocumentoCliente.CC,
                 TestDataFactory.numeroDocumento(),
                 TestDataFactory.nombreCompleto("Cliente IT"),
-                TestDataFactory.telefono(),
+                TestDataFactory.telefonos(),
                 TestDataFactory.email("cliente.it"),
                 "Calle IT 123",
                 rutaId);

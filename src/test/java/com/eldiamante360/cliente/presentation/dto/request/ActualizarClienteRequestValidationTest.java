@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +31,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void requestValido_noProduceViolaciones() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", "3001234567",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3");
 
         Set<ConstraintViolation<ActualizarClienteRequest>> violaciones = validator.validate(request);
@@ -40,7 +41,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void nombreVacio_produceViolacion() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("", "3001234567",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3");
 
         assertThat(validator.validate(request)).isNotEmpty();
@@ -48,7 +49,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void nombreExcedeLongitud_produceViolacion() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("a".repeat(151), "3001234567",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("a".repeat(151), List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3");
 
         assertThat(validator.validate(request)).isNotEmpty();
@@ -56,7 +57,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void telefonoExcedeLongitud_produceViolacion() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", "1".repeat(21),
+        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", List.of("1".repeat(21)),
                 "juan@correo.com", "Calle 1 # 2-3");
 
         assertThat(validator.validate(request)).isNotEmpty();
@@ -64,7 +65,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void emailConFormatoInvalido_produceViolacion() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", "3001234567",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", List.of("3001234567"),
                 "correo-invalido", "Calle 1 # 2-3");
 
         assertThat(validator.validate(request)).isNotEmpty();
@@ -72,7 +73,7 @@ class ActualizarClienteRequestValidationTest {
 
     @Test
     void direccionExcedeLongitud_produceViolacion() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", "3001234567",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "a".repeat(201));
 
         assertThat(validator.validate(request)).isNotEmpty();

@@ -29,7 +29,7 @@ public class ActualizarClienteService implements ActualizarClienteUseCase {
         Cliente cliente = clienteRepositoryPort.buscarPorId(command.clienteId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cliente", command.clienteId()));
 
-        cliente.actualizarDatos(command.nombre(), command.telefono(), command.email(), command.direccion());
+        cliente.actualizarDatos(command.nombre(), command.telefonos(), command.email(), command.direccion());
 
         Cliente guardado = clienteRepositoryPort.guardar(cliente);
 

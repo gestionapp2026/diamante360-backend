@@ -88,7 +88,7 @@ class CrearFacturaServiceTest {
         service = new CrearFacturaService(clienteRepositoryPort, productoRepositoryPort, facturaRepositoryPort,
                 historialFacturaRepositoryPort, movimientoInventarioRepositoryPort, registrarCreditoUseCase,
                 usuarioRepositoryPort, precioClienteProductoRepositoryPort);
-        cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
         categoria = new CategoriaProducto(1L, "Ahumados", "Productos ahumados", true);
         Usuario usuario = new Usuario(9L, "vendedor1", "hash", "Ana Gomez", null, true, false, null, 0);
@@ -261,7 +261,7 @@ class CrearFacturaServiceTest {
 
     @Test
     void ejecutar_conClienteInactivo_lanzaExcepcion() {
-        Cliente clienteInactivo = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente clienteInactivo = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, false, 0);
         DetalleFacturaCommand detalleCommand = new DetalleFacturaCommand(5L, BigDecimal.valueOf(2), BigDecimal.ZERO);
         CrearFacturaCommand command = new CrearFacturaCommand(1L, TipoPago.CONTADO, List.of(detalleCommand), 9L, MedioPago.EFECTIVO);

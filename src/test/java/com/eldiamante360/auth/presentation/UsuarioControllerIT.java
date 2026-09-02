@@ -219,7 +219,7 @@ class UsuarioControllerIT extends BaseIntegrationTest {
 
         String nuevoNombre = TestDataFactory.nombreCompleto("Nombre Actualizado");
         UsuarioResponse actualizado = AuthTestHelper.autenticado(admin.accessToken())
-                .body(new ActualizarUsuarioRequest(nuevoNombre, rolAdminId))
+                .body(new ActualizarUsuarioRequest(creado.username(), nuevoNombre, rolAdminId))
                 .when().put("/usuarios/{id}", creado.id())
                 .then().statusCode(200)
                 .extract().as(UsuarioResponse.class);
@@ -227,7 +227,44 @@ class UsuarioControllerIT extends BaseIntegrationTest {
         assertThat(actualizado.nombreCompleto()).isEqualTo(nuevoNombre);
         assertThat(actualizado.rolId()).isEqualTo(rolAdminId);
         assertThat(actualizado.rolNombre()).isEqualTo("ADMIN");
-        assertThat(actualizado.username()).isEqualTo(creado.username()); // el username no es editable por este endpoint
+        assertThat(actualizado.username()).isEqualTo(creado.username());
+    }
+
+    @Test
+    void actualizar_conUsernameNuevo_loRenombra() {
+        TokenResponse admin = AuthTestHelper.loginComoAdmin();
+        Long rolVendedorId = AuthTestHelper.obtenerRolIdPorNombre("VENDEDOR");
+        UsuarioResponse creado = AuthTestHelper.autenticado(admin.accessToken())
+                .body(new CrearUsuarioRequest(TestDataFactory.username("it_rename"), TestDataFactory.passwordValida(),
+                        "Nombre Original", rolVendedorId))
+                .when().post("/usuarios").then().statusCode(201).extract().as(UsuarioResponse.class);
+
+        String nuevoUsername = TestDataFactory.username("it_renombrado");
+        UsuarioResponse actualizado = AuthTestHelper.autenticado(admin.accessToken())
+                .body(new ActualizarUsuarioRequest(nuevoUsername, creado.nombreCompleto(), rolVendedorId))
+                .when().put("/usuarios/{id}", creado.id())
+                .then().statusCode(200)
+                .extract().as(UsuarioResponse.class);
+
+        assertThat(actualizado.username()).isEqualTo(nuevoUsername);
+    }
+
+    @Test
+    void actualizar_conUsernameYaUsadoPorOtroUsuario_devuelve409() {
+        TokenResponse admin = AuthTestHelper.loginComoAdmin();
+        Long rolVendedorId = AuthTestHelper.obtenerRolIdPorNombre("VENDEDOR");
+        String usernameExistente = TestDataFactory.username("it_existente");
+        AuthTestHelper.autenticado(admin.accessToken())
+                .body(new CrearUsuarioRequest(usernameExistente, TestDataFactory.passwordValida(), "Uno", rolVendedorId))
+                .when().post("/usuarios").then().statusCode(201);
+        UsuarioResponse otro = AuthTestHelper.autenticado(admin.accessToken())
+                .body(new CrearUsuarioRequest(TestDataFactory.username("it_otro"), TestDataFactory.passwordValida(), "Dos", rolVendedorId))
+                .when().post("/usuarios").then().statusCode(201).extract().as(UsuarioResponse.class);
+
+        AuthTestHelper.autenticado(admin.accessToken())
+                .body(new ActualizarUsuarioRequest(usernameExistente, otro.nombreCompleto(), rolVendedorId))
+                .when().put("/usuarios/{id}", otro.id())
+                .then().statusCode(409);
     }
 
     @Test
@@ -236,7 +273,7 @@ class UsuarioControllerIT extends BaseIntegrationTest {
         Long rolId = AuthTestHelper.obtenerRolIdPorNombre("VENDEDOR");
 
         AuthTestHelper.autenticado(admin.accessToken())
-                .body(new ActualizarUsuarioRequest("Nombre", rolId))
+                .body(new ActualizarUsuarioRequest(TestDataFactory.username("it_noexiste"), "Nombre", rolId))
                 .when().put("/usuarios/{id}", 999_999_999L)
                 .then().statusCode(404);
     }
@@ -250,11 +287,12 @@ class UsuarioControllerIT extends BaseIntegrationTest {
                 .when().post("/usuarios").then().statusCode(201).extract().as(UsuarioResponse.class);
 
         var respuesta = AuthTestHelper.autenticado(admin.accessToken())
-                .body(new ActualizarUsuarioRequest("", null))
+                .body(new ActualizarUsuarioRequest("", "", null))
                 .when().put("/usuarios/{id}", creado.id())
                 .then().statusCode(400);
 
         ApiErrorResponse error = ApiErrorAssertions.verificarFormaEstandar(respuesta, 400);
+        ApiErrorAssertions.verificarErrorDeCampo(error, "username", "El username es obligatorio");
         ApiErrorAssertions.verificarErrorDeCampo(error, "nombreCompleto", "El nombre completo es obligatorio");
         ApiErrorAssertions.verificarErrorDeCampo(error, "rolId", "El rol es obligatorio");
     }
@@ -264,7 +302,7 @@ class UsuarioControllerIT extends BaseIntegrationTest {
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
 
         AuthTestHelper.autenticado(vendedor.accessToken())
-                .body(new ActualizarUsuarioRequest("X", 1L))
+                .body(new ActualizarUsuarioRequest(TestDataFactory.username("it_sinpermiso"), "X", 1L))
                 .when().put("/usuarios/{id}", 1L)
                 .then().statusCode(403);
     }

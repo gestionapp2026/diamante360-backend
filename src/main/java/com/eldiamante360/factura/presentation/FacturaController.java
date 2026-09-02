@@ -11,6 +11,7 @@ import com.eldiamante360.factura.application.usecase.ListarHistorialFacturaUseCa
 import com.eldiamante360.factura.application.usecase.ObtenerDependenciasFacturaUseCase;
 import com.eldiamante360.factura.application.usecase.ObtenerFacturaUseCase;
 import com.eldiamante360.factura.domain.model.EstadoFactura;
+import com.eldiamante360.factura.infrastructure.pdf.FacturaPdfService;
 import com.eldiamante360.factura.presentation.dto.request.CrearFacturaRequest;
 import com.eldiamante360.factura.presentation.dto.response.FacturaResponse;
 import com.eldiamante360.factura.presentation.dto.response.HistorialFacturaResponse;
@@ -21,7 +22,10 @@ import com.eldiamante360.shared.presentation.PageResponse;
 import com.eldiamante360.shared.presentation.SecurityUtils;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,6 +48,7 @@ public class FacturaController {
     private final ObtenerSesionActualUseCase obtenerSesionActualUseCase;
     private final FacturaWebMapper facturaWebMapper;
     private final HistorialFacturaWebMapper historialFacturaWebMapper;
+    private final FacturaPdfService facturaPdfService;
 
     public FacturaController(CrearFacturaUseCase crearFacturaUseCase,
                               ObtenerFacturaUseCase obtenerFacturaUseCase,
@@ -56,7 +61,8 @@ public class FacturaController {
                               ObtenerDependenciasFacturaUseCase obtenerDependenciasFacturaUseCase,
                               ObtenerSesionActualUseCase obtenerSesionActualUseCase,
                               FacturaWebMapper facturaWebMapper,
-                              HistorialFacturaWebMapper historialFacturaWebMapper) {
+                              HistorialFacturaWebMapper historialFacturaWebMapper,
+                              FacturaPdfService facturaPdfService) {
         this.crearFacturaUseCase = crearFacturaUseCase;
         this.obtenerFacturaUseCase = obtenerFacturaUseCase;
         this.listarFacturasUseCase = listarFacturasUseCase;
@@ -69,6 +75,7 @@ public class FacturaController {
         this.obtenerSesionActualUseCase = obtenerSesionActualUseCase;
         this.facturaWebMapper = facturaWebMapper;
         this.historialFacturaWebMapper = historialFacturaWebMapper;
+        this.facturaPdfService = facturaPdfService;
     }
 
     @PostMapping
@@ -109,6 +116,19 @@ public class FacturaController {
         var sesion = obtenerSesionActualUseCase.ejecutar(authentication.getName());
         var resultado = anularFacturaUseCase.ejecutar(id, sesion.id());
         return ResponseEntity.ok(aplicarMascaraSensible(facturaWebMapper.toResponse(resultado), authentication));
+    }
+
+    @GetMapping("/{id}/pdf")
+    @PreAuthorize("hasAuthority('FACTURA_LEER')")
+    public ResponseEntity<byte[]> obtenerPdf(@PathVariable Long id) {
+        var factura = obtenerFacturaUseCase.ejecutar(id);
+        byte[] pdf = facturaPdfService.generar(factura);
+        String archivo = "factura-" + factura.numero() + ".pdf";
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline().filename(archivo).build().toString())
+                .body(pdf);
     }
 
     @GetMapping("/{id}/historial")

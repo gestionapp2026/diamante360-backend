@@ -79,15 +79,17 @@ class ClienteDetalleControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void registrarObservacion_comoVendedorSinPermisoClienteCrear_devuelve403() {
+    void registrarObservacion_comoVendedorConPermisoClienteCrear_devuelve201() {
+        // VENDEDOR tiene CLIENTE_CREAR (V21__permisos_vendedor_crear_cliente_producto.sql), que este
+        // endpoint reutiliza para registrar observaciones.
         TokenResponse admin = AuthTestHelper.loginComoAdmin();
         ClienteResponse cliente = ClienteTestHelper.crearClienteMinimo(admin.accessToken());
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
 
         AuthTestHelper.autenticado(vendedor.accessToken())
-                .body(new RegistrarObservacionRequest("Intento vendedor"))
+                .body(new RegistrarObservacionRequest("Observacion de vendedor"))
                 .when().post("/clientes/{clienteId}/observaciones", cliente.id())
-                .then().statusCode(403);
+                .then().statusCode(201);
     }
 
     // ---------------------------------------------------------------

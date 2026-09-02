@@ -12,6 +12,8 @@ import com.eldiamante360.cliente.presentation.dto.response.ClienteResponse;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClienteWebMapperTest {
@@ -21,7 +23,7 @@ class ClienteWebMapperTest {
     @Test
     void toCommand_desdeCrearClienteRequest_mapeaTodosLosCampos() {
         CrearClienteRequest request = new CrearClienteRequest(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", 2L);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", 2L);
 
         CrearClienteCommand command = mapper.toCommand(request, 1L);
 
@@ -34,7 +36,7 @@ class ClienteWebMapperTest {
 
     @Test
     void toCommand_desdeIdYActualizarClienteRequest_incluyeElId() {
-        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez Gomez", "3007654321",
+        ActualizarClienteRequest request = new ActualizarClienteRequest("Juan Perez Gomez", List.of("3007654321"),
                 "juan.gomez@correo.com", "Calle 5 # 6-7");
 
         ActualizarClienteCommand command = mapper.toCommand(5L, request, 1L);
@@ -58,7 +60,7 @@ class ClienteWebMapperTest {
     @Test
     void toResponse_desdeClienteResult_mapeaTodosLosCampos() {
         ClienteResult result = new ClienteResult(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", 2L, "Ruta Norte", true);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", 2L, "Ruta Norte", true);
 
         ClienteResponse response = mapper.toResponse(result);
 

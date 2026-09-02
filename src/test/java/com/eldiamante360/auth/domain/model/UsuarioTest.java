@@ -74,12 +74,13 @@ class UsuarioTest {
     }
 
     @Test
-    void actualizarDatos_cambiaNombreYRol() {
+    void actualizarDatos_cambiaUsernameNombreYRol() {
         Usuario usuario = Usuario.nuevo("jhon", "hash", "Jhon Perez", rolAdmin);
         Rol rolVendedor = new Rol(2L, "VENDEDOR", "Vendedor", Set.of());
 
-        usuario.actualizarDatos("Jhon Alberto Perez", rolVendedor);
+        usuario.actualizarDatos("jhon.perez", "Jhon Alberto Perez", rolVendedor);
 
+        assertThat(usuario.getUsername()).isEqualTo("jhon.perez");
         assertThat(usuario.getNombreCompleto()).isEqualTo("Jhon Alberto Perez");
         assertThat(usuario.getRol()).isEqualTo(rolVendedor);
     }

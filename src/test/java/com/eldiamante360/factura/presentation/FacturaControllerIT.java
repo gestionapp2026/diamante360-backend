@@ -609,6 +609,42 @@ class FacturaControllerIT extends BaseIntegrationTest {
     }
 
     // ---------------------------------------------------------------
+    // GET /facturas/{id}/pdf
+    // ---------------------------------------------------------------
+
+    @Test
+    void obtenerPdf_facturaExistente_devuelvePdfValido() {
+        TokenResponse admin = AuthTestHelper.loginComoAdmin();
+        ProductoResponse producto = ProductoTestHelper.crearProductoConCategoriaNueva(admin.accessToken(), BigDecimal.TEN);
+        ClienteResponse cliente = ClienteTestHelper.crearClienteMinimo(admin.accessToken());
+        FacturaResponse creada = crearFacturaContado(admin.accessToken(), cliente.id(), producto.id());
+
+        byte[] pdf = AuthTestHelper.autenticado(admin.accessToken())
+                .when().get("/facturas/{id}/pdf", creada.id())
+                .then().statusCode(200)
+                .contentType("application/pdf")
+                .extract().asByteArray();
+
+        assertThat(pdf).isNotEmpty();
+        assertThat(new String(pdf, 0, 5, java.nio.charset.StandardCharsets.US_ASCII)).isEqualTo("%PDF-");
+    }
+
+    @Test
+    void obtenerPdf_idInexistente_devuelve404() {
+        TokenResponse admin = AuthTestHelper.loginComoAdmin();
+
+        AuthTestHelper.autenticado(admin.accessToken())
+                .when().get("/facturas/999999999/pdf")
+                .then().statusCode(404);
+    }
+
+    @Test
+    void obtenerPdf_sinAutenticacion_devuelve401() {
+        given().when().get("/facturas/1/pdf")
+                .then().statusCode(401);
+    }
+
+    // ---------------------------------------------------------------
     // PATCH /facturas/{id}/anular
     // ---------------------------------------------------------------
 

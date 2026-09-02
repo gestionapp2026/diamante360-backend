@@ -47,7 +47,7 @@ public class CrearClienteService implements CrearClienteUseCase {
         }
 
         Cliente cliente = Cliente.nuevo(command.tipoDocumento(), command.numeroDocumento(), command.nombre(),
-                command.telefono(), command.email(), command.direccion(), ruta);
+                command.telefonos(), command.email(), command.direccion(), ruta);
 
         Cliente guardado = clienteRepositoryPort.guardar(cliente);
 

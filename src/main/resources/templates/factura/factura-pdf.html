@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="'Factura ' + ${factura.numero()}">Factura</title>
+    <style>
+        @page {
+            size: 58mm auto;
+            margin: 3mm;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-size: 8pt;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+            width: 52mm;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 6px auto;
+            max-width: 38mm;
+            max-height: 16mm;
+        }
+        .empresa {
+            text-align: center;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .subtitulo {
+            text-align: center;
+            font-size: 7pt;
+            margin-bottom: 6px;
+        }
+        .separador {
+            border-top: 1px dashed #000000;
+            margin: 5px 0;
+        }
+        .datos td {
+            padding: 1px 0;
+            font-size: 7.5pt;
+            vertical-align: top;
+        }
+        .datos td.etiqueta {
+            font-weight: bold;
+            padding-right: 3px;
+            white-space: nowrap;
+        }
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+        table.items th {
+            border-bottom: 1px solid #000000;
+            text-align: left;
+            font-size: 7pt;
+            padding-bottom: 2px;
+        }
+        table.items td {
+            font-size: 7.5pt;
+            padding: 2px 0;
+            vertical-align: top;
+        }
+        table.items td.num {
+            text-align: right;
+            white-space: nowrap;
+        }
+        .totales td {
+            font-size: 8pt;
+            padding: 1px 0;
+        }
+        .totales td.num {
+            text-align: right;
+        }
+        .totales tr.total-final td {
+            font-weight: bold;
+            font-size: 9.5pt;
+            border-top: 1px solid #000000;
+            padding-top: 3px;
+        }
+        .anulada {
+            text-align: center;
+            font-weight: bold;
+            font-size: 10pt;
+            border: 2px solid #000000;
+            padding: 4px;
+            margin: 6px 0;
+        }
+        .footer {
+            text-align: center;
+            font-size: 7pt;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <img class="logo" th:if="${logoBase64 != null}" th:src="'data:image/jpeg;base64,' + ${logoBase64}" alt="Logo"/>
+    <div class="empresa">El Diamante 360</div>
+    <div class="subtitulo">Productos carnicos - Factura de venta</div>
+
+    <div class="separador"></div>
+
+    <table class="datos">
+        <tr>
+            <td class="etiqueta">Factura</td>
+            <td th:text="${factura.numero()}"></td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Fecha</td>
+            <td th:text="${fechaFormateada}"></td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Cliente</td>
+            <td th:text="${factura.clienteNombre()}"></td>
+        </tr>
+        <tr th:if="${factura.clienteNumeroDocumento() != null}">
+            <td class="etiqueta">Documento</td>
+            <td th:text="${factura.clienteNumeroDocumento()}"></td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Pago</td>
+            <td th:text="${factura.tipoPago()} + (${factura.medioPago() != null} ? ' - ' + ${factura.medioPago()} : '')"></td>
+        </tr>
+        <tr>
+            <td class="etiqueta">Vendedor</td>
+            <td th:text="${factura.usuarioNombre()}"></td>
+        </tr>
+    </table>
+
+    <div class="separador"></div>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th class="num">Cant</th>
+                <th class="num">V.Unit</th>
+                <th class="num">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="detalle : ${factura.detalles()}">
+                <td th:text="${detalle.productoNombre()}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(detalle.cantidad(), 1, 2)}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(detalle.precioUnitario(), 1, 2, 'COMMA')}"></td>
+                <td class="num" th:text="${#numbers.formatDecimal(detalle.total(), 1, 2, 'COMMA')}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="separador"></div>
+
+    <table class="totales">
+        <tr>
+            <td>Subtotal</td>
+            <td class="num" th:text="${#numbers.formatDecimal(factura.subtotal(), 1, 2, 'COMMA')}"></td>
+        </tr>
+        <tr th:if="${factura.descuento() != null and factura.descuento().signum() > 0}">
+            <td>Descuento</td>
+            <td class="num" th:text="'-' + ${#numbers.formatDecimal(factura.descuento(), 1, 2, 'COMMA')}"></td>
+        </tr>
+        <tr class="total-final">
+            <td>TOTAL</td>
+            <td class="num" th:text="${#numbers.formatDecimal(factura.total(), 1, 2, 'COMMA')}"></td>
+        </tr>
+    </table>
+
+    <div class="anulada" th:if="${factura.estado().name() == 'ANULADA'}">FACTURA ANULADA</div>
+
+    <div class="footer">
+        <div>Gracias por su compra</div>
+    </div>
+
+</body>
+</html>
