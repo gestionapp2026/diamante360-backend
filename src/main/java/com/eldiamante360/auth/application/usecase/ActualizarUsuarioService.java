@@ -4,6 +4,7 @@ import com.eldiamante360.auth.application.dto.ActualizarUsuarioCommand;
 import com.eldiamante360.auth.application.dto.UsuarioResult;
 import com.eldiamante360.auth.application.port.RolRepositoryPort;
 import com.eldiamante360.auth.application.port.UsuarioRepositoryPort;
+import com.eldiamante360.auth.domain.exception.NombreUsuarioDuplicadoException;
 import com.eldiamante360.auth.domain.model.Rol;
 import com.eldiamante360.auth.domain.model.Usuario;
 import com.eldiamante360.shared.domain.exception.RecursoNoEncontradoException;
@@ -27,10 +28,15 @@ public class ActualizarUsuarioService implements ActualizarUsuarioUseCase {
         Usuario usuario = usuarioRepositoryPort.buscarPorId(command.usuarioId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario", command.usuarioId()));
 
+        if (!usuario.getUsername().equalsIgnoreCase(command.username())
+                && usuarioRepositoryPort.existePorUsername(command.username())) {
+            throw new NombreUsuarioDuplicadoException(command.username());
+        }
+
         Rol rol = rolRepositoryPort.buscarPorId(command.rolId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Rol", command.rolId()));
 
-        usuario.actualizarDatos(command.nombreCompleto(), rol);
+        usuario.actualizarDatos(command.username(), command.nombreCompleto(), rol);
 
         return UsuarioAssembler.toResult(usuarioRepositoryPort.guardar(usuario));
     }

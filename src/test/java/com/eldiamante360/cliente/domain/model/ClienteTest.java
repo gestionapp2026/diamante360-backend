@@ -2,6 +2,8 @@ package com.eldiamante360.cliente.domain.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClienteTest {
@@ -11,7 +13,7 @@ class ClienteTest {
     @Test
     void nuevo_creaClienteActivoSinRutaObligatoria() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         assertThat(cliente.isActivo()).isTrue();
         assertThat(cliente.getId()).isNull();
@@ -22,7 +24,7 @@ class ClienteTest {
     @Test
     void nuevo_conRuta_asignaLaRuta() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.NIT, "900123456", "Distribuidora XYZ",
-                "3009876543", "contacto@xyz.com", "Carrera 10 # 20-30", ruta);
+                List.of("3009876543"), "contacto@xyz.com", "Carrera 10 # 20-30", ruta);
 
         assertThat(cliente.getRuta()).isEqualTo(ruta);
     }
@@ -30,12 +32,12 @@ class ClienteTest {
     @Test
     void actualizarDatos_cambiaCamposEditables() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
-        cliente.actualizarDatos("Juan Perez Gomez", "3007654321", "juan.gomez@correo.com", "Calle 5 # 6-7");
+        cliente.actualizarDatos("Juan Perez Gomez", List.of("3007654321"), "juan.gomez@correo.com", "Calle 5 # 6-7");
 
         assertThat(cliente.getNombre()).isEqualTo("Juan Perez Gomez");
-        assertThat(cliente.getTelefono()).isEqualTo("3007654321");
+        assertThat(cliente.getTelefonos()).containsExactly("3007654321");
         assertThat(cliente.getEmail()).isEqualTo("juan.gomez@correo.com");
         assertThat(cliente.getDireccion()).isEqualTo("Calle 5 # 6-7");
     }
@@ -43,7 +45,7 @@ class ClienteTest {
     @Test
     void asignarRuta_conRutaNoNula_asignaLaRuta() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         cliente.asignarRuta(ruta);
 
@@ -53,7 +55,7 @@ class ClienteTest {
     @Test
     void asignarRuta_conNull_removueLaRuta() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", ruta);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", ruta);
 
         cliente.asignarRuta(null);
 
@@ -63,7 +65,7 @@ class ClienteTest {
     @Test
     void activarYDesactivar_cambianElEstado() {
         Cliente cliente = Cliente.nuevo(TipoDocumentoCliente.CC, "123456789", "Juan Perez",
-                "3001234567", "juan@correo.com", "Calle 1 # 2-3", null);
+                List.of("3001234567"), "juan@correo.com", "Calle 1 # 2-3", null);
 
         cliente.desactivar();
         assertThat(cliente.isActivo()).isFalse();

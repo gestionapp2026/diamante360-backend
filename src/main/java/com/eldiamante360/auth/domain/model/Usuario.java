@@ -70,7 +70,8 @@ public class Usuario {
         this.activo = false;
     }
 
-    public void actualizarDatos(String nombreCompleto, Rol rol) {
+    public void actualizarDatos(String username, String nombreCompleto, Rol rol) {
+        this.username = username;
         this.nombreCompleto = nombreCompleto;
         this.rol = rol;
     }

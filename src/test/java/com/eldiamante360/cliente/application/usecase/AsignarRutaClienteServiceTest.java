@@ -1,5 +1,6 @@
 package com.eldiamante360.cliente.application.usecase;
 
+import java.util.List;
 import com.eldiamante360.cliente.application.dto.AsignarRutaClienteCommand;
 import com.eldiamante360.cliente.application.dto.ClienteResult;
 import com.eldiamante360.cliente.application.port.ClienteRepositoryPort;
@@ -46,7 +47,7 @@ class AsignarRutaClienteServiceTest {
     @BeforeEach
     void setUp() {
         service = new AsignarRutaClienteService(clienteRepositoryPort, rutaRepositoryPort, historialClienteRepositoryPort);
-        cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
     }
 
@@ -72,7 +73,7 @@ class AsignarRutaClienteServiceTest {
     @Test
     void ejecutar_conRutaIdNulo_removueLaRutaYRegistraHistorial() {
         Ruta ruta = new Ruta(2L, "Ruta Norte", "Zona norte", true);
-        Cliente clienteConRuta = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente clienteConRuta = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", ruta, true, 0);
         AsignarRutaClienteCommand command = new AsignarRutaClienteCommand(5L, null, 1L);
         when(clienteRepositoryPort.buscarPorId(5L)).thenReturn(Optional.of(clienteConRuta));

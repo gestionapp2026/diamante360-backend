@@ -1,5 +1,6 @@
 package com.eldiamante360.cliente.application.usecase;
 
+import java.util.List;
 import com.eldiamante360.cliente.application.dto.ObservacionClienteResult;
 import com.eldiamante360.cliente.application.dto.RegistrarObservacionClienteCommand;
 import com.eldiamante360.cliente.application.port.ClienteRepositoryPort;
@@ -40,7 +41,7 @@ class RegistrarObservacionClienteServiceTest {
 
     @Test
     void ejecutar_conClienteExistente_registraLaObservacion() {
-        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
         RegistrarObservacionClienteCommand command = new RegistrarObservacionClienteCommand(5L,
                 "Cliente prefiere entregas en la manana", 1L);

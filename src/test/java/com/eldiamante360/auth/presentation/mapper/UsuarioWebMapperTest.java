@@ -31,11 +31,12 @@ class UsuarioWebMapperTest {
 
     @Test
     void toCommand_desdeIdYActualizarUsuarioRequest_incluyeElId() {
-        ActualizarUsuarioRequest request = new ActualizarUsuarioRequest("Jhon Alberto Perez", 2L);
+        ActualizarUsuarioRequest request = new ActualizarUsuarioRequest("jhon.perez", "Jhon Alberto Perez", 2L);
 
         ActualizarUsuarioCommand command = mapper.toCommand(7L, request);
 
         assertThat(command.usuarioId()).isEqualTo(7L);
+        assertThat(command.username()).isEqualTo("jhon.perez");
         assertThat(command.nombreCompleto()).isEqualTo("Jhon Alberto Perez");
         assertThat(command.rolId()).isEqualTo(2L);
     }

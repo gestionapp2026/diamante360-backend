@@ -37,11 +37,13 @@ class RolControllerIT extends BaseIntegrationTest {
                 "ROL_GESTIONAR", "INVENTARIO_AJUSTAR", "INSUMO_AJUSTAR");
 
         RolResponse rolVendedor = roles.stream().filter(r -> r.nombre().equals("VENDEDOR")).findFirst().orElseThrow();
-        // VENDEDOR: factura, consulta cartera de deudores y ciclo completo de ordenes (ver V14__add_permisos_orden.sql).
+        // VENDEDOR: factura, consulta cartera de deudores, ciclo completo de ordenes (V14) y puede
+        // crear clientes/productos sobre la marcha al facturar (V21).
         assertThat(rolVendedor.permisos()).containsExactlyInAnyOrder(
                 "DASHBOARD_LEER", "PRODUCTO_LEER", "CLIENTE_LEER",
                 "FACTURA_LEER", "FACTURA_CREAR", "DEUDOR_LEER", "DEUDOR_ABONAR",
-                "ORDEN_LEER", "ORDEN_CREAR", "ORDEN_DESPACHAR", "ORDEN_ANULAR");
+                "ORDEN_LEER", "ORDEN_CREAR", "ORDEN_DESPACHAR", "ORDEN_ANULAR",
+                "CLIENTE_CREAR", "PRODUCTO_CREAR");
     }
 
     @Test

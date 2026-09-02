@@ -135,14 +135,16 @@ class CategoriaControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void crear_comoVendedorSinPermisoProductoCrear_devuelve403() {
+    void crear_comoVendedorConPermisoProductoCrear_devuelve201() {
+        // VENDEDOR tiene PRODUCTO_CREAR (V21__permisos_vendedor_crear_cliente_producto.sql), que este
+        // endpoint reutiliza para crear categorias.
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
         var request = new CrearCategoriaRequest(TestDataFactory.nombreCompleto("Categoria Vendedor"), "Descripcion");
 
         AuthTestHelper.autenticado(vendedor.accessToken())
                 .body(request)
                 .when().post("/categorias")
-                .then().statusCode(403);
+                .then().statusCode(201);
     }
 
     // ---------------------------------------------------------------

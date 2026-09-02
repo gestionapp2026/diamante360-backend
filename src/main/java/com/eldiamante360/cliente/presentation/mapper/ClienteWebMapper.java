@@ -32,7 +32,7 @@ public interface ClienteWebMapper {
                 original.tipoDocumento(),
                 null,
                 original.nombre(),
-                original.telefono(),
+                original.telefonos(),
                 original.email(),
                 original.direccion(),
                 original.rutaId(),

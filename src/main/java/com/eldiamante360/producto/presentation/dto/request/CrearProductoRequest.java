@@ -27,7 +27,6 @@ public record CrearProductoRequest(
         @DecimalMin(value = "0", message = "El precio de compra no puede ser negativo")
         BigDecimal precioCompra,
 
-        @NotNull(message = "El precio de venta es obligatorio")
         @DecimalMin(value = "0", message = "El precio de venta no puede ser negativo")
         BigDecimal precioVenta,
 

@@ -1,5 +1,7 @@
 package com.eldiamante360.cliente.domain.model;
 
+import java.util.List;
+
 /**
  * Cliente del catalogo comercial (persona natural o juridica que compra
  * los productos de la empresa). Puede asignarse opcionalmente a una
@@ -13,7 +15,7 @@ public class Cliente {
     private final TipoDocumentoCliente tipoDocumento;
     private final String numeroDocumento;
     private String nombre;
-    private String telefono;
+    private List<String> telefonos;
     private String email;
     private String direccion;
     private Ruta ruta;
@@ -21,12 +23,12 @@ public class Cliente {
     private final Integer version;
 
     public Cliente(Long id, TipoDocumentoCliente tipoDocumento, String numeroDocumento, String nombre,
-                    String telefono, String email, String direccion, Ruta ruta, boolean activo, Integer version) {
+                    List<String> telefonos, String email, String direccion, Ruta ruta, boolean activo, Integer version) {
         this.id = id;
         this.tipoDocumento = tipoDocumento;
         this.numeroDocumento = numeroDocumento;
         this.nombre = nombre;
-        this.telefono = telefono;
+        this.telefonos = telefonos != null ? telefonos : List.of();
         this.email = email;
         this.direccion = direccion;
         this.ruta = ruta;
@@ -35,13 +37,13 @@ public class Cliente {
     }
 
     public static Cliente nuevo(TipoDocumentoCliente tipoDocumento, String numeroDocumento, String nombre,
-                                 String telefono, String email, String direccion, Ruta ruta) {
-        return new Cliente(null, tipoDocumento, numeroDocumento, nombre, telefono, email, direccion, ruta, true, null);
+                                 List<String> telefonos, String email, String direccion, Ruta ruta) {
+        return new Cliente(null, tipoDocumento, numeroDocumento, nombre, telefonos, email, direccion, ruta, true, null);
     }
 
-    public void actualizarDatos(String nombre, String telefono, String email, String direccion) {
+    public void actualizarDatos(String nombre, List<String> telefonos, String email, String direccion) {
         this.nombre = nombre;
-        this.telefono = telefono;
+        this.telefonos = telefonos != null ? telefonos : List.of();
         this.email = email;
         this.direccion = direccion;
     }
@@ -74,8 +76,8 @@ public class Cliente {
         return nombre;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public List<String> getTelefonos() {
+        return telefonos;
     }
 
     public String getEmail() {

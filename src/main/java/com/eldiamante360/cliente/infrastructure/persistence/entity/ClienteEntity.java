@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -14,6 +16,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "cliente")
@@ -39,8 +42,9 @@ public class ClienteEntity {
     @Column(nullable = false, length = 150)
     private String nombre;
 
-    @Column(length = 30)
-    private String telefono;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "telefonos", columnDefinition = "text[]", nullable = false)
+    private List<String> telefonos;
 
     @Column(length = 120)
     private String email;

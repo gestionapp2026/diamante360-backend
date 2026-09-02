@@ -1,5 +1,6 @@
 package com.eldiamante360.cliente.application.usecase;
 
+import java.util.List;
 import com.eldiamante360.cliente.application.port.ClienteRepositoryPort;
 import com.eldiamante360.cliente.domain.model.Cliente;
 import com.eldiamante360.cliente.domain.model.TipoDocumentoCliente;
@@ -42,7 +43,7 @@ class ObtenerDependenciasClienteServiceTest {
     void setUp() {
         service = new ObtenerDependenciasClienteService(clienteRepositoryPort, facturaJpaRepository,
                 ordenJpaRepository, cuentaPorCobrarJpaRepository);
-        cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
     }
 

@@ -98,13 +98,15 @@ class RutaControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void crear_comoVendedorSinPermisoClienteCrear_devuelve403() {
+    void crear_comoVendedorConPermisoClienteCrear_devuelve201() {
+        // VENDEDOR tiene CLIENTE_CREAR (V21__permisos_vendedor_crear_cliente_producto.sql), que este
+        // endpoint reutiliza para crear rutas.
         TokenResponse vendedor = AuthTestHelper.crearUsuarioYLogin("VENDEDOR");
 
         AuthTestHelper.autenticado(vendedor.accessToken())
                 .body(new CrearRutaRequest(TestDataFactory.nombreCompleto("Vendedor Ruta"), null))
                 .when().post("/rutas")
-                .then().statusCode(403);
+                .then().statusCode(201);
     }
 
     // ---------------------------------------------------------------

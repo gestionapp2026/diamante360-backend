@@ -48,7 +48,7 @@ class ListarFacturasPorClienteServiceTest {
 
     @Test
     void ejecutar_conClienteExistente_retornaLaPaginaMapeada() {
-        Cliente cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente cliente = new Cliente(1L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
         DetalleFactura detalle = DetalleFactura.nuevo(5L, "Chorizo", BigDecimal.valueOf(2), BigDecimal.valueOf(1500), BigDecimal.ZERO);
         Factura factura = new Factura(100L, "FAC-2026-00001", 1L, "Juan Perez", "123456789", TipoPago.CONTADO,

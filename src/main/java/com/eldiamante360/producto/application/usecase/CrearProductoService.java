@@ -12,6 +12,8 @@ import com.eldiamante360.shared.domain.exception.RecursoNoEncontradoException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @Transactional
 public class CrearProductoService implements CrearProductoUseCase {
@@ -38,8 +40,9 @@ public class CrearProductoService implements CrearProductoUseCase {
             throw new CategoriaInactivaException(categoria.getNombre());
         }
 
+        BigDecimal precioVenta = command.precioVenta() != null ? command.precioVenta() : BigDecimal.ZERO;
         Producto producto = Producto.nuevo(command.nombre(), categoria, command.tipoVenta(), command.unidadMedida(),
-                command.precioCompra(), command.precioVenta(), command.stockInicial(), command.stockMinimo());
+                command.precioCompra(), precioVenta, command.stockInicial(), command.stockMinimo());
 
         return ProductoAssembler.toResult(productoRepositoryPort.guardar(producto));
     }

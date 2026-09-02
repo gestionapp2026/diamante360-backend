@@ -43,7 +43,7 @@ class ListarClientesPorRutaServiceTest {
     @Test
     void ejecutar_conRutaExistente_retornaLaPaginaMapeada() {
         Ruta ruta = new Ruta(2L, "Ruta Norte", "Zona norte", true);
-        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", ruta, true, 0);
         Pageable pageable = PageRequest.of(0, 10);
         when(rutaRepositoryPort.buscarPorId(2L)).thenReturn(Optional.of(ruta));

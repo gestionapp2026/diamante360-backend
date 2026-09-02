@@ -1,5 +1,6 @@
 package com.eldiamante360.shared.it;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -55,5 +56,10 @@ public final class TestDataFactory {
     public static String telefono() {
         long base = 3_000_000_000L + (Math.abs(System.nanoTime()) % 900_000_000L);
         return Long.toString(base);
+    }
+
+    /** Lista de un solo telefono de prueba, para CrearClienteRequest/ActualizarClienteRequest.telefonos(). */
+    public static List<String> telefonos() {
+        return List.of(telefono());
     }
 }

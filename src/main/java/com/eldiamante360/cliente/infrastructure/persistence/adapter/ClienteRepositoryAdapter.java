@@ -49,7 +49,7 @@ public class ClienteRepositoryAdapter implements ClienteRepositoryPort {
                 .tipoDocumento(cliente.getTipoDocumento())
                 .numeroDocumento(cliente.getNumeroDocumento())
                 .nombre(cliente.getNombre())
-                .telefono(cliente.getTelefono())
+                .telefonos(cliente.getTelefonos())
                 .email(cliente.getEmail())
                 .direccion(cliente.getDireccion())
                 .ruta(rutaReferencia)

@@ -43,7 +43,7 @@ class ListarHistorialClienteServiceTest {
 
     @Test
     void ejecutar_conClienteExistente_retornaLaPaginaMapeada() {
-        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", "3001234567",
+        Cliente cliente = new Cliente(5L, TipoDocumentoCliente.CC, "123456789", "Juan Perez", List.of("3001234567"),
                 "juan@correo.com", "Calle 1 # 2-3", null, true, 0);
         HistorialCliente historial = HistorialCliente.nuevo(5L, TipoEventoCliente.CREACION, "Cliente creado", 1L);
         Pageable pageable = PageRequest.of(0, 10);
